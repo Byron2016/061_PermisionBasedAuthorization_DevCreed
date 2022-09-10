@@ -145,3 +145,23 @@
 						}
 					}
 				```
+				
+			- Modify StartUp class to use AddIdentity<> instead of AddDefaultIdentity
+				```cs
+					namespace PBaseWebADotNet5.Web
+					{
+						public class Startup
+						{
+							....
+							public void ConfigureServices(IServiceCollection services)
+							{
+								....
+								services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+									.AddEntityFrameworkStores<ApplicationDbContext>()
+									.AddDefaultUI();
+								....
+							}
+							....
+						}
+					}
+				```
