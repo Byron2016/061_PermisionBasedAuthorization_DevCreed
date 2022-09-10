@@ -16,3 +16,13 @@
 				- Authentication Type: Individual Accounts
 				- Configure for HTPPS
 				- Enable Razor runtime compilation
+				
+		- Agregar conectionString
+			```cs
+				{
+				  "ConnectionStrings": {
+					"DefaultConnection": "Server=localhost;Database=db_DebCreed;User ID=sa;Password=123456;MultipleActiveResultSets=true",
+				  },
+				  ....
+				}
+			```
