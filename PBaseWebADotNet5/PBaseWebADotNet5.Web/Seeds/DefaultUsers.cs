@@ -18,7 +18,7 @@ namespace PBaseWebADotNet5.Web.Seeds
                 EmailConfirmed = true
             };
 
-            var user = userManager.FindByEmailAsync(defaultUser.Email);
+            var user = await userManager.FindByEmailAsync(defaultUser.Email);
 
             if(user == null)
             {
@@ -36,7 +36,7 @@ namespace PBaseWebADotNet5.Web.Seeds
                 EmailConfirmed = true
             };
 
-            var user = userManager.FindByEmailAsync(defaultUser.Email);
+            var user = await userManager.FindByEmailAsync(defaultUser.Email);
 
             if (user == null)
             {
@@ -50,7 +50,7 @@ namespace PBaseWebADotNet5.Web.Seeds
 
         private static async Task SeedClaimsForSuperUser(this RoleManager<IdentityRole> roleManager)
         {
-            var adminRole = await roleManager.FindByIdAsync(Roles.SuperAdmin.ToString());
+            var adminRole = await roleManager.FindByNameAsync(Roles.SuperAdmin.ToString());
             await roleManager.AddPermissionClaims(adminRole, "Products");
         }
 
@@ -61,7 +61,7 @@ namespace PBaseWebADotNet5.Web.Seeds
 
             foreach(var permission in allPermissions)
             {
-                if(allClaims.Any(c => c.Type == "Permission" && c.Value == permission))
+                if(!allClaims.Any(c => c.Type == "Permission" && c.Value == permission))
                     await roleManager.AddClaimAsync(role, new Claim("Permission", permission));
             }
 

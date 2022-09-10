@@ -94,7 +94,7 @@
 									EmailConfirmed = true
 								};
 					
-								var user = userManager.FindByEmailAsync(defaultUser.Email);
+								var user = await  userManager.FindByEmailAsync(defaultUser.Email);
 					
 								if(user == null)
 								{
@@ -112,7 +112,7 @@
 									EmailConfirmed = true
 								};
 					
-								var user = userManager.FindByEmailAsync(defaultUser.Email);
+								var user = await  userManager.FindByEmailAsync(defaultUser.Email);
 					
 								if (user == null)
 								{
@@ -126,7 +126,7 @@
 					
 							private static async Task SeedClaimsForSuperUser(this RoleManager<IdentityRole> roleManager)
 							{
-								var adminRole = await roleManager.FindByIdAsync(Roles.SuperAdmin.ToString());
+								var adminRole = await roleManager.FindByNameAsync(Roles.SuperAdmin.ToString());
 								await roleManager.AddPermissionClaims(adminRole, "Products");
 							}
 					
@@ -137,7 +137,7 @@
 					
 								foreach(var permission in allPermissions)
 								{
-									if(allClaims.Any(c => c.Type == "Permission" && c.Value == permission))
+									if(!allClaims.Any(c => c.Type == "Permission" && c.Value == permission))
 										await roleManager.AddClaimAsync(role, new Claim("Permission", permission));
 								}
 					
@@ -207,3 +207,14 @@
 			- Create a new migration and migrate to data base 
 				- add-migration InitialMigration
 				- update-database -v
+				
+			- Run application to seed information. 
+				select * from dbo.AspNetRoleClaims;
+				select * from dbo.AspNetRoles;
+				select * from dbo.AspNetUserClaims;
+				select * from dbo.AspNetUserLogins;
+				select * from dbo.AspNetUserRoles;
+				select * from dbo.AspNetUsers;
+				select * from dbo.AspNetUserTokens;
+				
+			
