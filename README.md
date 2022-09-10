@@ -203,3 +203,7 @@
 						}
 					}
 				```
+				
+			- Create a new migration and migrate to data base 
+				- add-migration InitialMigration
+				- update-database -v
