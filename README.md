@@ -26,3 +26,17 @@
 				  ....
 				}
 			```
+		- Seeds
+			- Create enum Roles en "./Constants/Roles.cs
+				```cs
+					namespace PBaseWebADotNet5.Web.Constants
+					{
+						public enum Roles
+						{
+							SuperAdmin,
+							Admin,
+							Basic
+						}
+					}
+				```
+			
