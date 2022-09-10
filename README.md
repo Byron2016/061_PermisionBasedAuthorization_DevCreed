@@ -3,6 +3,7 @@
 - DevCreed: Permission Based Authorization In .Net 5 (Core) 
 	- https://www.youtube.com/watch?v=slTben1Djz0&list=PL62tSREI9C-fGaDsCUvu5OaPWrv-mMzy-
 	
+		- Github: https://github.com/muhammadelhelaly/PermissionBasedAuthorizationIntDotNet5
 		- V002 Crear aplicación ASP.NET Web Application(.NET Framework)
 			- Carpeta relacionada 
 				061_PermisionBasedAuthorization_DevCreed\NET50
@@ -54,6 +55,25 @@
 									await roleManager.CreateAsync(new IdentityRole(Roles.Basic.ToString()));
 								}
 								
+							}
+						}
+					}
+				```
+			- Create class Permissions en "./Constants/Permissions.cs
+				```cs
+					namespace PBaseWebADotNet5.Web.Constants
+					{
+						public static class Permissions
+						{
+							public static List<string> GeneratePermissionList(string module)
+							{
+								return new List<string>
+								{
+									$"Permissions.{module}.View",
+									$"Permissions.{module}.Create",
+									$"Permissions.{module}.Edit",
+									$"Permissions.{module}.Delete"
+								};
 							}
 						}
 					}
