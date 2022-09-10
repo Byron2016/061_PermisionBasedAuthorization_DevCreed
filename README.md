@@ -124,7 +124,7 @@
 								await roleManager.SeedClaimsForSuperUser();
 							}
 					
-							public static async Task SeedClaimsForSuperUser(this RoleManager<IdentityRole> roleManager)
+							private static async Task SeedClaimsForSuperUser(this RoleManager<IdentityRole> roleManager)
 							{
 								var adminRole = await roleManager.FindByIdAsync(Roles.SuperAdmin.ToString());
 								await roleManager.AddPermissionClaims(adminRole, "Products");
@@ -161,6 +161,44 @@
 									.AddDefaultUI();
 								....
 							}
+							....
+						}
+					}
+				```
+				
+			- Modify Program/Main class to seed database
+				```cs
+					namespace PBaseWebADotNet5.Web
+					{
+						public class Program
+						{
+							public static async Task Main(string[] args)
+							{
+								var host = CreateHostBuilder(args).Build();
+								using var scope = host.Services.CreateScope();
+								var services = scope.ServiceProvider;
+								var loggerFactory = services.GetRequiredService<ILoggerProvider>();
+								var logger = loggerFactory.CreateLogger("app");
+								try
+								{
+									var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+									var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+									await Seeds.DefaultRoles.SeedAsyn(roleManager);
+									await Seeds.DefaultUsers.SeedBasicUserAsync(userManager);
+									await Seeds.DefaultUsers.SeedSuperAdminUserAsync(userManager, roleManager);
+									logger.LogInformation("Data Seeded");
+									logger.LogInformation("Application Started");
+								}
+								catch (System.Exception ex)
+								{
+					
+									logger.LogWarning(ex, "An Error occurred while seeding data");
+								}
+					
+					
+								host.Run();
+							}
+					
 							....
 						}
 					}

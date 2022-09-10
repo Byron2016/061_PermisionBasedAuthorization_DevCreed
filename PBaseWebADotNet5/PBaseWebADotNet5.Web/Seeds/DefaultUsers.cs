@@ -48,7 +48,7 @@ namespace PBaseWebADotNet5.Web.Seeds
             await roleManager.SeedClaimsForSuperUser();
         }
 
-        public static async Task SeedClaimsForSuperUser(this RoleManager<IdentityRole> roleManager)
+        private static async Task SeedClaimsForSuperUser(this RoleManager<IdentityRole> roleManager)
         {
             var adminRole = await roleManager.FindByIdAsync(Roles.SuperAdmin.ToString());
             await roleManager.AddPermissionClaims(adminRole, "Products");
