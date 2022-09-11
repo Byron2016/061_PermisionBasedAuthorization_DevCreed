@@ -257,3 +257,159 @@
 						}
 					}
 				```
+
+			- Create a new UserController Class
+				- A nivel de clase tendrá un RoleBasedAuthentication
+					- [Authorize(Roles = "SuperAdmin")]
+				```cs
+					namespace PBaseWebADotNet5.Web.Controllers
+					{
+						[Authorize(Roles = "SuperAdmin")]
+						public class UsersController : Controller
+						{
+							private readonly UserManager<IdentityUser> _userManager;
+							private readonly RoleManager<IdentityRole> _roleManager;
+							private readonly SignInManager<IdentityUser> _signInManager;
+					
+							public UsersController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager)
+							{
+								_userManager = userManager;
+								_roleManager = roleManager;
+								_signInManager = signInManager;
+							}
+					
+							public async Task<IActionResult> Index()
+							{
+								var users = await _userManager.Users
+									.Select(user => new UserViewModel { Id = user.Id, UserName = user.UserName, Email = user.Email, Roles = _userManager.GetRolesAsync(user).Result })
+									.ToListAsync();
+					
+								return View(users);
+							}
+					
+							public async Task<IActionResult> ManageRoles(string userId)
+							{
+								var user = await _userManager.FindByIdAsync(userId);
+					
+								if (user == null)
+									return NotFound();
+					
+								var roles = await _roleManager.Roles.ToListAsync();
+					
+								var viewModel = new UserRolesViewModel
+								{
+									UserId = user.Id,
+									UserName = user.UserName,
+									Roles = roles.Select(role => new CheckBoxViewModel
+									{
+										DisplayValue = role.Name,
+										IsSelected = _userManager.IsInRoleAsync(user, role.Name).Result
+									}).ToList()
+								};
+					
+								return View(viewModel);
+							}
+					
+							[HttpPost]
+							[ValidateAntiForgeryToken]
+							public async Task<IActionResult> UpdateRoles(UserRolesViewModel model)
+							{
+								var user = await _userManager.FindByIdAsync(model.UserId);
+					
+								if (user == null)
+									return NotFound();
+					
+								var userRoles = await _userManager.GetRolesAsync(user);
+					
+								await _userManager.RemoveFromRolesAsync(user, userRoles);
+								await _userManager.AddToRolesAsync(user, model.Roles.Where(r => r.IsSelected).Select(r => r.DisplayValue));
+					
+								//foreach (var role in model.Roles)
+								//{
+								//    if (userRoles.Any(r => r == role.RoleName) && !role.IsSelected)
+								//        await _userManager.RemoveFromRoleAsync(user, role.RoleName);
+					
+								//    if (!userRoles.Any(r => r == role.RoleName) && role.IsSelected)
+								//        await _userManager.AddToRoleAsync(user, role.RoleName);
+								//}
+					
+								return RedirectToAction(nameof(Index));
+							}
+						}
+					}
+				```
+				
+				- Views
+					- Add Index view
+					```cs
+						@model IEnumerable<UserViewModel>
+						
+						@{
+							ViewData["Title"] = "Users";
+						}
+						
+						
+						
+						<h1>User List</h1>
+						
+						<hr />
+						
+						<table class="table table-striped" id="userTable">
+							<thead>
+								<tr>
+									<th>User</th>
+									<th>Email</th>
+									<th>Roles</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var user in Model)
+								{
+									<tr>
+										<td>@user.UserName</td>
+										<td>@user.Email</td>
+										<td>@string.Join(" , ", user.Roles.ToList())</td>
+										<td>
+											<a class="btn btn-primary" asp-action="ManageRoles" asp-route-userId="@user.Id">Manage Roles</a>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					```
+				- Add ManageRoles view
+					```cs
+						@model UserRolesViewModel
+						
+						@{
+							ViewData["Title"] = "Manage Roles";
+						}
+						
+						<form asp-action="UpdateRoles" method="post">
+							<div class="card mt-4">
+								<div class="card-header">
+									<h2>@Model.UserName</h2>
+									Add/Remove Roles
+								</div>
+								<div class="card-body">
+									<input type="hidden" asp-for="UserId" />
+									@for (int i = 0; i < Model.Roles.Count; i++)
+									{
+										<div class="form-check m-1">
+											<input type="hidden" asp-for="@Model.Roles[i].DisplayValue" />
+											<input asp-for="@Model.Roles[i].IsSelected" class="form-check-input" />
+											<label class="form-check-label" asp-for="@Model.Roles[i].IsSelected">
+												@Model.Roles[i].DisplayValue
+											</label>
+										</div>
+									}
+									<div asp-validation-summary="All" class="text-danger"></div>
+								</div>
+								<div class="card-footer">
+									<button type="submit" class="btn btn-primary">Save</button>
+									<a asp-action="Index" class="btn btn-secondary">Cancel</a>
+								</div>
+							</div>
+						</form>
+					```
