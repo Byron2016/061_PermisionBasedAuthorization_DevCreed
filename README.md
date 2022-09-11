@@ -217,4 +217,43 @@
 				select * from dbo.AspNetUsers;
 				select * from dbo.AspNetUserTokens;
 				
-			
+		- UserController V5.
+			- ViewModels
+				- Create a new class ViewModel/CheckBoxViewModel
+				```cs
+					namespace PBaseWebADotNet5.Web.ViewModel
+					{
+						public class CheckBoxViewModel
+						{
+							public string DisplayValue { get; set; }
+							public bool IsSelected { get; set; }
+						}
+					}
+				```
+				
+				- Create a new class ViewModel/UserRolesViewModel
+				```cs
+					namespace PBaseWebADotNet5.Web.ViewModel
+					{
+						public class UserRolesViewModel
+						{
+							public string UserId { get; set; }
+							public string UserName { get; set; }
+							public List<CheckBoxViewModel> Roles { get; set; }
+						}
+					}
+				```
+
+				- Create a new class ViewModel/UserViewModel
+				```cs
+					namespace PBaseWebADotNet5.Web.ViewModel
+					{
+						public class UserViewModel
+						{
+							public string Id { get; set; }
+							public string UserName { get; set; }
+							public string Email { get; set; }
+							public IEnumerable<string> Roles { get; set; }
+						}
+					}
+				```
