@@ -413,3 +413,30 @@
 							</div>
 						</form>
 					```
+					
+		- RolesController V8.
+			- ViewModels
+				- Create a new class ViewModel/RoleFormViewModel
+				```cs
+					namespace PBaseWebADotNet5.Web.ViewModel
+					{
+						public class RoleFormViewModel
+						{
+							[Required, StringLength(256)]
+							public string Name { get; set; }
+						}
+					}
+				```
+				
+				- Create a new class ViewModel/PermissionsFormViewModel
+				```cs
+					namespace PBaseWebADotNet5.Web.ViewModel
+					{
+						public class PermissionsFormViewModel
+						{
+							public string RoleId { get; set; }
+							public string RoleName { get; set; }
+							public List<CheckBoxViewModel> RoleCalims { get; set; }
+						}
+					}
+				```
