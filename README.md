@@ -824,3 +824,63 @@
 								}
 							}
 						```
+						
+					- Controller
+						- Add new methods to ProductsController Class
+						```cs
+							namespace PBaseWebADotNet5.Web.Controllers
+							{
+								public class ProductsController : Controller
+								{
+									public IActionResult Index()
+									{
+										return View();
+									}
+							
+									[Authorize(Permissions.Products.Edit)]
+									public IActionResult Edit()
+									{
+										return View();
+									}
+								}
+							}
+						```
+						- Views
+							- Add Index view
+							```cs
+								@inject IAuthorizationService AuthorizationService
+								
+								@using PBaseWebADotNet5.Web.Constants
+								
+								@{
+									ViewData["Title"] = "Products";
+								}
+								
+								<h1>Manage Products</h1>
+								<hr />
+								
+								@if (AuthorizationService.AuthorizeAsync(User, Permissions.Products.View).Result.Succeeded)
+								{
+									<a href="#" class="btn btn-primary">View</a>
+								}
+								
+								@if (AuthorizationService.AuthorizeAsync(User, Permissions.Products.Create).Result.Succeeded)
+								{
+									<a href="#" class="btn btn-secondary">Create</a>
+								}
+								
+								@if (AuthorizationService.AuthorizeAsync(User, Permissions.Products.Edit).Result.Succeeded)
+								{
+									<a asp-action="Edit" class="btn btn-success">Edit</a>
+								}
+								
+								@if (AuthorizationService.AuthorizeAsync(User, Permissions.Products.Delete).Result.Succeeded)
+								{
+									<a href="#" class="btn btn-danger">Delete</a>
+								}
+							```
+							- Add Edit view
+							```cs
+								<p>Hello from Edit view!</p>
+
+							```
