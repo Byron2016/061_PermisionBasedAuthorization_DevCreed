@@ -884,3 +884,24 @@
 								<p>Hello from Edit view!</p>
 
 							```
+							
+				- Security Stamp Validator Options
+					```cs
+						namespace PBaseWebADotNet5.Web
+						{
+							public class Startup
+							{
+								....
+								public void ConfigureServices(IServiceCollection services)
+								{
+									....
+						
+									services.Configure<SecurityStampValidatorOptions>(options =>
+									{
+										options.ValidationInterval = TimeSpan.Zero;
+									});
+						
+									services.AddControllersWithViews();
+								}
+
+					```
