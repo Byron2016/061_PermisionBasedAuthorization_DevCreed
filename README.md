@@ -579,3 +579,64 @@
 						}
 					}
 				```
+				
+			- Add new methods to RolesController Class
+				```cs
+					namespace PBaseWebADotNet5.Web.Controllers
+					{
+						[Authorize(Roles = "SuperAdmin")]
+						public class RolesController : Controller
+						{	
+							....
+							
+							public async Task<IActionResult> ManagePermissions(string roleId)
+							{
+								var role = await _roleManager.FindByIdAsync(roleId);
+					
+								if (role == null)
+									return NotFound();
+					
+								var roleClaims = _roleManager.GetClaimsAsync(role).Result.Select(c => c.Value).ToList();
+								var allClaims = Permissions.GenerateAllPermissions();
+								var allPermissions = allClaims.Select(p => new CheckBoxViewModel { DisplayValue = p }).ToList();
+					
+								foreach (var permission in allPermissions)
+								{
+									if (roleClaims.Any(c => c == permission.DisplayValue))
+										permission.IsSelected = true;
+								}
+					
+								var viewModel = new PermissionsFormViewModel
+								{
+									RoleId = roleId,
+									RoleName = role.Name,
+									RoleCalims = allPermissions
+								};
+					
+								return View(viewModel);
+							}
+					
+							[HttpPost]
+							[ValidateAntiForgeryToken]
+							public async Task<IActionResult> ManagePermissions(PermissionsFormViewModel model)
+							{
+								var role = await _roleManager.FindByIdAsync(model.RoleId);
+					
+								if (role == null)
+									return NotFound();
+					
+								var roleClaims = await _roleManager.GetClaimsAsync(role);
+					
+								foreach (var claim in roleClaims)
+									await _roleManager.RemoveClaimAsync(role, claim);
+					
+								var selectedClaims = model.RoleCalims.Where(c => c.IsSelected).ToList();
+					
+								foreach (var claim in selectedClaims)
+									await _roleManager.AddClaimAsync(role, new Claim("Permission", claim.DisplayValue));
+					
+								return RedirectToAction(nameof(Index));
+							}
+						}
+					}
+				```
