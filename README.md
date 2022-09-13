@@ -779,3 +779,23 @@
 								}
 							}
 						```	
+						
+				- Add Filters like a service.
+					- Add services to StartUp.cs 
+						```cs
+							namespace PBaseWebADotNet5.Web
+							{
+								public class Startup
+								{
+									....
+							
+									public void ConfigureServices(IServiceCollection services)
+									{
+										services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+										services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+							
+										....
+									}
+									
+									....
+						```	
