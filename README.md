@@ -542,3 +542,17 @@
 						}
 					}
 				```
+				
+			- Contants
+				- Add enum Constants/Modules with a list of all modules
+				```cs
+					namespace PBaseWebADotNet5.Web.Constants
+					{
+						public enum Modules
+						{
+							Products,
+							Stock,
+							Categories
+						}
+					}
+				```
