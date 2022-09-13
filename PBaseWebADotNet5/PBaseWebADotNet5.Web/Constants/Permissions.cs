@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PBaseWebADotNet5.Web.Constants
 {
@@ -13,6 +14,18 @@ namespace PBaseWebADotNet5.Web.Constants
                 $"Permissions.{module}.Edit",
                 $"Permissions.{module}.Delete"
             };
+        }
+
+        public static List<string> GenerateAllPermissions()
+        {
+            var allPermissions = new List<string>();
+
+            var modules = Enum.GetValues(typeof(Modules));
+
+            foreach (var module in modules)
+                allPermissions.AddRange(GeneratePermissionList(module.ToString()));
+
+            return allPermissions;
         }
     }
 }
