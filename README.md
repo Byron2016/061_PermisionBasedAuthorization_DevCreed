@@ -695,3 +695,87 @@
 							</div>
 						</form>
 					```	
+					
+			- Add Customs Policy V.13
+				- Add Filters
+					- Add Filters/PermissionAuthorizationHandler
+						```cs
+							namespace PBaseWebADotNet5.Web.Filters
+							{
+								public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
+								{
+									public PermissionAuthorizationHandler()
+									{
+							
+									}
+							
+									protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
+									{
+										if (context.User == null)
+											return;
+							
+										var canAccess = context.User.Claims.Any(c => c.Type == "Permission" && c.Value == requirement.Permission && c.Issuer == "LOCAL AUTHORITY");
+							
+										if (canAccess)
+										{
+											context.Succeed(requirement);
+											return;
+										}
+									}
+								}
+							}
+						```	
+						
+					- Add Filters/PermissionPolicyProvider
+						```cs
+							namespace PBaseWebADotNet5.Web.Filters
+							{
+								public class PermissionPolicyProvider : IAuthorizationPolicyProvider
+								{
+									public DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
+							
+									public PermissionPolicyProvider(IOptions<AuthorizationOptions> options)
+									{
+										FallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
+									}
+							
+									public Task<AuthorizationPolicy> GetDefaultPolicyAsync()
+									{
+										return FallbackPolicyProvider.GetDefaultPolicyAsync();
+									}
+							
+									public Task<AuthorizationPolicy> GetFallbackPolicyAsync()
+									{
+										return FallbackPolicyProvider.GetDefaultPolicyAsync();
+									}
+							
+									public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
+									{
+										if (policyName.StartsWith("Permission", StringComparison.OrdinalIgnoreCase))
+										{
+											var policy = new AuthorizationPolicyBuilder();
+											policy.AddRequirements(new PermissionRequirement(policyName));
+											return Task.FromResult(policy.Build());
+										}
+							
+										return FallbackPolicyProvider.GetPolicyAsync(policyName);
+									}
+								}
+							}
+						```	
+						
+					- Add Filters/PermissionRequirement
+						```cs
+							namespace PBaseWebADotNet5.Web.Filters
+							{
+								public class PermissionRequirement : IAuthorizationRequirement
+								{
+									public string Permission { get; private set; }
+							
+									public PermissionRequirement(string permission)
+									{
+										Permission = permission;
+									}
+								}
+							}
+						```	
