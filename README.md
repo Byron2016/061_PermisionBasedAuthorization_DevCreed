@@ -527,3 +527,18 @@
 							<span asp-validation-for="Name" class="text-danger"></span>
 						</form>
 					```
+					
+		- Permissions V10.
+			- ViewModels
+				- Create a new class ViewModel/PermissionsFormViewModel
+				```cs
+					namespace PBaseWebADotNet5.Web.ViewModel
+					{
+						public class PermissionsFormViewModel
+						{
+							public string RoleId { get; set; }
+							public string RoleName { get; set; }
+							public List<CheckBoxViewModel> RoleCalims { get; set; }
+						}
+					}
+				```
