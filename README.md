@@ -427,3 +427,103 @@
 						}
 					}
 				```
+
+			- Create a new RolesController Class
+				- A nivel de clase tendrá un RoleBasedAuthentication
+					- [Authorize(Roles = "SuperAdmin")]
+				```cs
+					namespace PBaseWebADotNet5.Web.Controllers
+					{
+						[Authorize(Roles = "SuperAdmin")]
+						public class RolesController : Controller
+						{
+							private readonly RoleManager<IdentityRole> _roleManager;
+					
+							public RolesController(RoleManager<IdentityRole> roleManager)
+							{
+								_roleManager = roleManager;
+							}
+					
+					
+							public async Task<IActionResult> Index()
+							{
+								var roles = await _roleManager.Roles.ToListAsync();
+								return View(roles);
+							}
+					
+							[HttpPost]
+							[ValidateAntiForgeryToken]
+							public async Task<IActionResult> Add(RoleFormViewModel model)
+							{
+								if (!ModelState.IsValid)
+									return View("Index", await _roleManager.Roles.ToListAsync());
+					
+								if (await _roleManager.RoleExistsAsync(model.Name))
+								{
+									ModelState.AddModelError("Name", "Role is exists!");
+									return View("Index", await _roleManager.Roles.ToListAsync());
+								}
+					
+								await _roleManager.CreateAsync(new IdentityRole(model.Name.Trim()));
+					
+								return RedirectToAction(nameof(Index));
+							}
+						}
+					}
+				```
+				
+				- Views
+					- Add Index view
+					```cs
+						@model IEnumerable<IdentityRole>
+						
+						@using PBaseWebADotNet5.Web.Constants
+						
+						@{
+							ViewData["Title"] = "Roles";
+						}
+						
+						<h1>Roles</h1>
+						
+						<partial name="_RoleForm" model="new RoleFormViewModel()" />
+						
+						<table class="table table-striped mt-4">
+							<thead>
+								<tr class="bg-primary text-white">
+									<th>Id</th>
+									<th>Role Name</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var role in Model)
+								{
+									<tr>
+										<td>@role.Id</td>
+										<td>@role.Name</td>
+										<td>
+											<a class="btn btn-primary" asp-action="ManagePermissions" asp-route-roleId="@role.Id">Manage Permissions</a>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+						
+						@section Scripts {
+							<partial name="_ValidationScriptsPartial" />
+						}
+					```
+				- Add partial view _RoleForm
+					```cs
+						@model RoleFormViewModel
+						
+						<form method="post" asp-action="Add">
+							<div class="input-group mb-3">
+								<input asp-for="Name" class="form-control" placeholder="Role name..." />
+								<div class="input-group-append">
+									<button type="submit" class="btn btn-primary">Add New Role</button>
+								</div>
+							</div>
+							<span asp-validation-for="Name" class="text-danger"></span>
+						</form>
+					```
